@@ -9,16 +9,10 @@ ranges = [
     [0, 16]
 ]
 
-def runner(index, result):
-  print("new thread")
-  for i in range(index):
-    print(f"Thread: {i}, {0}, {1}")
-    print(ranges[i])
-    for j in range(ranges[i][0], ranges[i][1]+1):
-      result[i] += j
-    print(result)
-
-
+def sum_values(index, start, end, result):
+  result[index] = sum(range(start,end+1))
+  print(f"Thread: {index}, with result: {result[index]}")
+    
 print("Main thread starting")
 
 # set n to length of ranges declared 
@@ -26,13 +20,16 @@ n = len(ranges)
 
 # Create an array of `n` zeros
 result = [0] * n
-
+threads = []
 # create threads of quantitiy n using runner
-t = threading.Thread(target=runner, args=(n,result,))
-t.start()
 
+for i in range(n):
+  t = threading.Thread(target=sum_values, args=(i,ranges[i][0],ranges[i][1],result,))
+  t.start()
+  threads.append(t)
 
-t.join()
+for t in threads:
+  t.join()
 
-print(result)
 print("Main thread done")
+print(f"Final results: {sum(result)}")
